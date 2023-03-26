@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
 
@@ -22,21 +23,20 @@ import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
  * Responses fuer das Front End
  */
 @RestController
-@RequestMapping("/software")
+@RequestMapping(value = "/server")
 @RequiredArgsConstructor
 public class ServerResource {
     private final ItemServiceImpl itemService;
 
     /**
      * Baut das Response-Objekt fuer Get-Request: mehrere Items
-     * @param limit Anzahl zu zeigender Items
      * @return Response
      */
     @GetMapping("/list")
-    public ResponseEntity<Response> getItems(int limit) {
+    public ResponseEntity<Response> getItems() {
         return ResponseEntity.ok(
                 Response.builder().timestamp(LocalDateTime.now())
-                        .data(Map.of("items", itemService.list(limit)))
+                        .data(Map.of("items", itemService.list(30)))
                         .message("Items retrieved")
                         .status(OK)
                         .statusCode(OK.value())
@@ -96,10 +96,18 @@ public class ServerResource {
         );
     }
 
-    @GetMapping(path="/image/{filename}", produces = IMAGE_PNG_VALUE) // Erstellt PNG-Werte, keine JSONs
-    public byte[] getCategoryImage(@PathVariable("filename") String filename) throws IOException {
-       return Files.readAllBytes(Paths.get("src", "main", "java", "de"
-               , "lagerverwaltung", "software", "images", filename));
+
+    //Test Request
+    @GetMapping("test")
+    public ResponseEntity<String> testRequest(){
+        String response = "Hello";
+        return new ResponseEntity<>(OK);
     }
 
+    //@GetMapping(path="/image/{filename}", produces = IMAGE_PNG_VALUE) // Erstellt PNG-Werte, keine JSONs
+    //public byte[] getCategoryImage(@PathVariable("filename") String filename) throws IOException {
+    //   return Files.readAllBytes(Paths.get("src", "main", "java", "de"
+    //           , "lagerverwaltung", "software", "images", filename));
+    //}
+//
 }

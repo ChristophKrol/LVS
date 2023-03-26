@@ -22,6 +22,6 @@ public class Item {
     private double price;
     private int space;
     private Category category;
-    private String imageUrl;
+    //private String imageUrl;
 
 }

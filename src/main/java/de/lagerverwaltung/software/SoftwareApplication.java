@@ -20,14 +20,12 @@ public class SoftwareApplication {
 	@Bean
 	CommandLineRunner run(ItemRepo itemRepo){
 		return args -> {
-			itemRepo.save(new Item(null, "Gurke", 0.4, 1
-					, GROCERIES, GROCERIES.getImageUrl()));
-			itemRepo.save(new Item(null, "Laptop", 100, 7
-					, ELECTRONIC_DEVICES, ELECTRONIC_DEVICES.getImageUrl()));
-			itemRepo.save(new Item(null, "Gartenstuhl", 4, 15
-					, SEASON_ITEMS, SEASON_ITEMS.getImageUrl()));
-			itemRepo.save(new Item(null, "Seife", 1, 1
-					, HYGIENE_ITEMS, HYGIENE_ITEMS.getImageUrl()));
+			itemRepo.save(new Item(null, "Gurke", 0.5, 1, GROCERIES));
+			itemRepo.save(new Item(null, "Laptop", 1000, 7, ELECTRONIC_DEVICES));
+			itemRepo.save(new Item(null, "Gartenstuhl", 14, 20, SEASON_ITEMS));
+			itemRepo.save(new Item(null, "Besen", 5, 7, HOUSEHOLD_ITEMS));
+			itemRepo.save(new Item(null, "Seife", 0.8, 1, HYGIENE_ITEMS));
+
 		};
 
 	};

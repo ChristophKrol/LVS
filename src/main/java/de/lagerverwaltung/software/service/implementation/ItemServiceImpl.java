@@ -31,7 +31,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item create(Item item) {
         log.info("Saving new item: {}", item.getName());
-        item.setImageUrl(item.getCategory().getImageUrl()); //Set Image of items category
+        //item.setImageUrl(item.getCategory().getImageUrl()); //Set Image of items category
         return itemRepo.save(item);
     }
 
