@@ -29,10 +29,11 @@ public class ServerResource {
     private final ItemServiceImpl itemService;
 
     /**
+     * ITEM
      * Baut das Response-Objekt fuer Get-Request: mehrere Items
      * @return Response
      */
-    @GetMapping("/list")
+    @GetMapping("/item/list")
     public ResponseEntity<Response> getItems() {
         return ResponseEntity.ok(
                 Response.builder().timestamp(LocalDateTime.now())
@@ -44,12 +45,14 @@ public class ServerResource {
         );
     }
 
+
+
     /**
      * Baue das Response-Objekt für Get-Request: ein Item
      * @param id ID des Items
      * @return Response
      */
-    @GetMapping("/get/{id}")
+    @GetMapping("/item/get/{id}")
     public ResponseEntity<Response> getItem(@PathVariable("id") Long id) {
         return ResponseEntity.ok(
                 Response.builder().timestamp(LocalDateTime.now())
@@ -66,7 +69,7 @@ public class ServerResource {
      * @param item zu speicherndes Item
      * @return Response
      */
-    @PostMapping("/save")
+    @PostMapping("/item/save")
     public ResponseEntity<Response> saveItem(@RequestBody Item item) {
         return ResponseEntity.ok(
                 Response.builder()
@@ -84,7 +87,7 @@ public class ServerResource {
      * @param id ID des Items
      * @return Response
      */
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/item/delete/{id}")
     public ResponseEntity<Response> deleteItem(@PathVariable("id") Long id) {
         return ResponseEntity.ok(
                 Response.builder().timestamp(LocalDateTime.now())
@@ -98,7 +101,7 @@ public class ServerResource {
 
 
     //Test Request
-    @GetMapping("test")
+    @GetMapping("/test")
     public ResponseEntity<String> testRequest(){
         String response = "Hello";
         return new ResponseEntity<>(OK);
