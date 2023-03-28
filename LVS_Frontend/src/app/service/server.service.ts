@@ -55,7 +55,7 @@ export class ServerService {
         message = `Items filtered by ${category} category`;
       } else {
         const categoryString = getCategoryString(category);
-        filteredItems = response.data.items.filter(item => item.category === category);
+        filteredItems = response.data.items.filter(item => item.category === category); // Nimm SAchen raus, die gewünschte Category haben
 
         //Ist das gefilterte Array nicht leer? (Gibt es items aus Kategorie XY)
         if (filteredItems.length > 0) {
@@ -66,7 +66,7 @@ export class ServerService {
           response.data.items = [];
         }
       }
-
+      // Response wird überschrieben (... Response) --> Modifikation d. response 
       subscriber.next({
         ...response,
         message,
@@ -74,7 +74,7 @@ export class ServerService {
       }); //.next -> Neue Werte schreiben
       subscriber.complete();
 
-      // Hilfsfunktion für Category
+     
       function getCategoryString(category: Category): string {
         switch (category) {
           case Category.ELECTRONIC_DEVICES:

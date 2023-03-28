@@ -1,1 +1,199 @@
-<div> {{appState$ | async | json }}</div>
+<ng-container *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">  
+  <header>
+    <h1> Dashboard </h1>   
+    <ng-container *ngSwitchCase="DataState.LOADING">
+      <div class="spinner-border" role="status">
+        <span class="sr-only"></span>
+      </div>
+    </ng-container>  
+  </header>
+  <section>
+    <div class="container row content-panel rounded-4">
+      <div class="row ">
+        <div class="col-md-3 col-sm-6">
+          <span class="item-data-span text-center">
+            <h3> Gelagerte Ware </h3>
+            <ng-container *ngSwitchCase="DataState.LOADED">
+              <h2> 1000 </h2>
+            </ng-container>
+          </span>
+        </div>  
+        <div class="col-md-3 col-sm-6">
+          <span class="item-data-span text-center">
+            <h3> Eingänge </h3>
+            <ng-container *ngSwitchCase="DataState.LOADED">
+              <h2> 1000 </h2>
+            </ng-container>
+          </span>
+        </div> 
+        <div class="col-md-3 col-sm-6">
+          <span class="item-data-span text-center">
+            <h3> Ausgänge </h3>
+            <ng-container *ngSwitchCase="DataState.LOADED">
+              <h2> 1000 </h2>
+            </ng-container>
+          </span>
+        </div> 
+        <div class="col-md-3 col-sm-6">
+          <span class="item-data-span text-center">
+            <h3> Warenwert </h3>
+            <ng-container *ngSwitchCase="DataState.LOADED">
+              <h2> 1000 </h2>
+            </ng-container>
+          </span>
+        </div> 
+
+
+      </div>
+      
+        <div class="col-md-6 col-sm-12 chart-container">
+          <div class="pie-chart">
+            <canvas id="item-categories"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-12 chart-container">
+          <div class="pie-chart">
+            <canvas id="categories-value"></canvas>
+          </div>
+        </div>
+      
+    </div>
+
+
+  </section>
+  <section>
+    <div class="container content-panel rounded-4">
+      <div class="content-header">
+        <h2> Warendaten </h2>
+        <span>
+          <select  ngModel="ALL" name="category" class="btn btn-info"> //nochmal gucken
+              <option value="ALL"> Alle </option>
+              <option value="GROCERIES"> Lebensmittel </option>
+              <option value="ELECTRONIC_DEVICES"> Elektronik </option>
+              <option value="HYGIENE_ITEMS"> Hygieneartikel </option>
+              <option value="SEASON_ITEMS"> Saisonartikel </option>
+              <option value="HOUSEHOLD_ITEMS"> Haushaltsgegenstände </option>
+          </select>
+        </span>
+      </div>
+      <ng-container *ngSwitchCase="DataState.LOADED">
+        <table class="table table-striped table-hover table-bordered" id="table-panel">
+          <thead>
+            <tr>
+              <th> Name </th>
+              <th> ID </th>
+              <th> Größe </th>
+              <th> Preis </th>
+              <th> Kategorie </th>
+              <th> Aktion </th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let item of appState.appData.data.items; let i = index">
+            <tr>
+              <th> {{item.name}} </th>
+              <th> {{item.id}} </th>
+              <th> {{item.space}} </th>
+              <th> {{item.price}} </th>
+              <th> {{getCategoryString(item.category)}} </th>
+              <th> 
+                <button class="btn" >
+                  <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 96 960 960" width="25" style="fill:white">
+                    <path d="M180 936q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v90h-60v-90H180v600h600v-90h60v90q0 24-18 42t-42 18H180Zm513-174-42-42 113-114H383v-60h381L651 432l42-42 186 186-186 186Z"/>
+                  </svg>
+                </button> 
+              </th>
+            </tr>
+          </tbody>
+        </table>
+      </ng-container>  
+      <div class="content-footer">
+        <button (click)="addClass('popup-new-item')" class="btn" >
+          <span id="new-item-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 96 960 960" width="40" style="fill:white">
+              <path d="M450 856V606H200v-60h250V296h60v250h250v60H510v250h-60Z"/>
+            </svg>
+            <p> Ware erfassen </p>
+          </span>     
+        </button>
+      </div>
+
+    </div>
+  </section>
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <div>
+      <div class="popup show">
+        <div class="popup-frame rounded-4">
+          <div class="popup-header">
+          </div>
+          <h2>Fehler beim Laden der Daten</h2>
+          <div class="popup-content" style="text-align:center">
+            {{appState.error}}
+          </div>
+          <div class="popup-footer">
+            <button class="btn" type="button"> <p>Nochmal Versuchen</p> </button>
+          </div>
+        </div>    
+      </div>
+      
+    </div>
+  </ng-container>
+</ng-container>  
+
+  <div class="popup">
+    <div class="popup-frame rounded-4">
+      <div class="popup-header">
+        <button class="btn-close"></button>
+      </div>
+      <h2>Warenausgang durchführen</h2>
+      <div class="popup-content">
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1">#</span>
+          <input type="text" class="form-control" placeholder="Anzahl angeben" aria-label="Anzahl">
+        </div>  
+      </div>
+      <div class="popup-footer">
+        <button class="btn" type="submit"> <p>Bestätigen</p> </button>
+      </div>
+    </div>    
+  </div>    
+
+
+
+  <div class="popup " id="popup-new-item">
+    <div class="popup-frame rounded-4">
+      <div class="popup-header">
+        <button (click)="removeClass('popup-new-item')" class="btn-close"></button>
+      </div>
+      <h2>Neue Ware erfassen</h2>
+      <div class="popup-content">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Name" aria-label="Name">
+          <span class="input-group-text" id="basic-addon1">€</span>
+          <input type="text" class="form-control" placeholder="Preis/Stück" aria-label="Preis" aria-describedby="basic-addon1">
+        </div>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Größe" aria-label="Größe">
+          <span class="input-group-text" id="basic-addon1">#</span>
+          <input type="text" class="form-control" placeholder="Anzahl" aria-label="Anzahl">
+        </div>
+        <div class="btn-div">
+          <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Kategorie wählen
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item active" href="#">Lebensmittel</a></li>
+            <li><a class="dropdown-item" href="#">Elektronik</a></li>
+            <li><a class="dropdown-item" href="#">Hygiene</a></li>
+                                                                            <!--<li><hr class="dropdown-divider"></li> => Divider für SPäter--> 
+            <li><a class="dropdown-item" href="#">Saison</a></li>
+            <li><a class="dropdown-item" href="#">Haushalt</a></li>
+          </ul> 
+        </div>
+      </div>
+      <div class="popup-footer">
+        <button class="btn" type="submit" id="add-item-submit"> Ware hinzufügen </button>
+      </div>
+    </div>
+  </div>
+
+
