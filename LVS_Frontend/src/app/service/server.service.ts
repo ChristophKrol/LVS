@@ -48,6 +48,7 @@ export class ServerService {
   //Filter by Category
   filter$ = (category: Category, response: CustomResponse) => new Observable<CustomResponse>(
     subscriber => {
+      console.log("serverService.filter$(response)");
       console.log(response);
       let message: string;
       let filteredItems: Item[] = [];
@@ -56,7 +57,8 @@ export class ServerService {
       } else {
         const categoryString = getCategoryString(category);
         filteredItems = response.data.items.filter(item => item.category === category); // Nimm SAchen raus, die gewünschte Category haben
-
+        console.log("serverService.filter$: filtered");
+        console.log(response);
         //Ist das gefilterte Array nicht leer? (Gibt es items aus Kategorie XY)
         if (filteredItems.length > 0) {
           message = `Items filtered by ${categoryString} category`;

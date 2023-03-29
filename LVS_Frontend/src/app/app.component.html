@@ -1,11 +1,11 @@
-<ng-container *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">  
+<ng-container *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
   <header>
-    <h1> Dashboard </h1>   
+    <h1> Dashboard </h1>
     <ng-container *ngSwitchCase="DataState.LOADING">
       <div class="spinner-border" role="status">
         <span class="sr-only"></span>
       </div>
-    </ng-container>  
+    </ng-container>
   </header>
   <section>
     <div class="container row content-panel rounded-4">
@@ -17,7 +17,7 @@
               <h2> 1000 </h2>
             </ng-container>
           </span>
-        </div>  
+        </div>
         <div class="col-md-3 col-sm-6">
           <span class="item-data-span text-center">
             <h3> Eingänge </h3>
@@ -25,7 +25,7 @@
               <h2> 1000 </h2>
             </ng-container>
           </span>
-        </div> 
+        </div>
         <div class="col-md-3 col-sm-6">
           <span class="item-data-span text-center">
             <h3> Ausgänge </h3>
@@ -33,7 +33,7 @@
               <h2> 1000 </h2>
             </ng-container>
           </span>
-        </div> 
+        </div>
         <div class="col-md-3 col-sm-6">
           <span class="item-data-span text-center">
             <h3> Warenwert </h3>
@@ -41,22 +41,22 @@
               <h2> 1000 </h2>
             </ng-container>
           </span>
-        </div> 
+        </div>
 
 
       </div>
-      
-        <div class="col-md-6 col-sm-12 chart-container">
-          <div class="pie-chart">
-            <canvas id="item-categories"></canvas>
-          </div>
+
+      <div class="col-md-6 col-sm-12 chart-container">
+        <div class="pie-chart">
+          <canvas id="item-categories"></canvas>
         </div>
-        <div class="col-md-6 col-sm-12 chart-container">
-          <div class="pie-chart">
-            <canvas id="categories-value"></canvas>
-          </div>
+      </div>
+      <div class="col-md-6 col-sm-12 chart-container">
+        <div class="pie-chart">
+          <canvas id="categories-value"></canvas>
         </div>
-      
+      </div>
+
     </div>
 
 
@@ -66,13 +66,14 @@
       <div class="content-header">
         <h2> Warendaten </h2>
         <span>
-          <select  ngModel="ALL" name="category" class="btn btn-info"> //nochmal gucken
-              <option value="ALL"> Alle </option>
-              <option value="GROCERIES"> Lebensmittel </option>
-              <option value="ELECTRONIC_DEVICES"> Elektronik </option>
-              <option value="HYGIENE_ITEMS"> Hygieneartikel </option>
-              <option value="SEASON_ITEMS"> Saisonartikel </option>
-              <option value="HOUSEHOLD_ITEMS"> Haushaltsgegenstände </option>
+          <select (change)="filterItems($event)" name="category" class="btn btn-info" id="categorySelect"> //nochmal
+            gucken
+            <option value="ALL"> Alle </option>
+            <option value="GROCERIES"> Lebensmittel </option>
+            <option value="ELECTRONIC_DEVICES"> Elektronik </option>
+            <option value="HYGIENE_ITEMS"> Hygieneartikel </option>
+            <option value="SEASON_ITEMS"> Saisonartikel </option>
+            <option value="HOUSEHOLD_ITEMS"> Haushaltsgegenstände </option>
           </select>
         </span>
       </div>
@@ -95,25 +96,27 @@
               <th> {{item.space}} </th>
               <th> {{item.price}} </th>
               <th> {{getCategoryString(item.category)}} </th>
-              <th> 
-                <button class="btn" >
-                  <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 96 960 960" width="25" style="fill:white">
-                    <path d="M180 936q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v90h-60v-90H180v600h600v-90h60v90q0 24-18 42t-42 18H180Zm513-174-42-42 113-114H383v-60h381L651 432l42-42 186 186-186 186Z"/>
+              <th>
+                <button class="btn" (click)="deleteItem(item)"> <!-- addClass('popup-delete-item') -->
+                  <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 96 960 960" width="25"
+                    style="fill:white">
+                    <path
+                      d="M180 936q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v90h-60v-90H180v600h600v-90h60v90q0 24-18 42t-42 18H180Zm513-174-42-42 113-114H383v-60h381L651 432l42-42 186 186-186 186Z" />
                   </svg>
-                </button> 
+                </button>
               </th>
             </tr>
           </tbody>
         </table>
-      </ng-container>  
+      </ng-container>
       <div class="content-footer">
-        <button (click)="addClass('popup-new-item')" class="btn" >
+        <button (click)="addClass('popup-new-item')" class="btn">
           <span id="new-item-btn">
             <svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 96 960 960" width="40" style="fill:white">
-              <path d="M450 856V606H200v-60h250V296h60v250h250v60H510v250h-60Z"/>
+              <path d="M450 856V606H200v-60h250V296h60v250h250v60H510v250h-60Z" />
             </svg>
             <p> Ware erfassen </p>
-          </span>     
+          </span>
         </button>
       </div>
 
@@ -130,70 +133,73 @@
             {{appState.error}}
           </div>
           <div class="popup-footer">
-            <button class="btn" type="button"> <p>Nochmal Versuchen</p> </button>
+            <button class="btn" type="button">
+              <p>Nochmal Versuchen</p>
+            </button>
           </div>
-        </div>    
+        </div>
       </div>
-      
+
     </div>
   </ng-container>
-</ng-container>  
+</ng-container>
 
-  <div class="popup">
+
+<div class="popup " id="popup-new-item">
+  <form >     <!-- #itemForm="ngForm" (ngSubmit)="saveItem(itemForm)" -->
     <div class="popup-frame rounded-4">
       <div class="popup-header">
-        <button class="btn-close"></button>
-      </div>
-      <h2>Warenausgang durchführen</h2>
-      <div class="popup-content">
-        <div class="input-group mb-3">
-          <span class="input-group-text" id="basic-addon1">#</span>
-          <input type="text" class="form-control" placeholder="Anzahl angeben" aria-label="Anzahl">
-        </div>  
-      </div>
-      <div class="popup-footer">
-        <button class="btn" type="submit"> <p>Bestätigen</p> </button>
-      </div>
-    </div>    
-  </div>    
-
-
-
-  <div class="popup " id="popup-new-item">
-    <div class="popup-frame rounded-4">
-      <div class="popup-header">
-        <button (click)="removeClass('popup-new-item')" class="btn-close"></button>
+        <button (click)="removeClass('popup-new-item')" class="btn-close" id="close-new-item"></button>
       </div>
       <h2>Neue Ware erfassen</h2>
       <div class="popup-content">
+  
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Name" aria-label="Name">
+          <input type="text" class="form-control" placeholder="Name" aria-label="Name" required>
           <span class="input-group-text" id="basic-addon1">€</span>
-          <input type="text" class="form-control" placeholder="Preis/Stück" aria-label="Preis" aria-describedby="basic-addon1">
+          <input type="text" class="form-control" placeholder="Preis/Stück" aria-label="Preis"
+            aria-describedby="basic-addon1" required>
         </div>
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Größe" aria-label="Größe">
+          <input type="text" class="form-control" placeholder="Größe" aria-label="Größe" required>
           <span class="input-group-text" id="basic-addon1">#</span>
-          <input type="text" class="form-control" placeholder="Anzahl" aria-label="Anzahl">
+          <input type="text" class="form-control" placeholder="Anzahl" aria-label="Anzahl" required>
         </div>
         <div class="btn-div">
-          <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Kategorie wählen
-          </button>
-          <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item active" href="#">Lebensmittel</a></li>
-            <li><a class="dropdown-item" href="#">Elektronik</a></li>
-            <li><a class="dropdown-item" href="#">Hygiene</a></li>
-                                                                            <!--<li><hr class="dropdown-divider"></li> => Divider für SPäter--> 
-            <li><a class="dropdown-item" href="#">Saison</a></li>
-            <li><a class="dropdown-item" href="#">Haushalt</a></li>
-          </ul> 
+          <select (change)="filterItems($event)" name="category" class="btn btn-info"> //nochmal gucken
+            <option value="GROCERIES"> Lebensmittel </option>
+            <option value="ELECTRONIC_DEVICES"> Elektronik </option>
+            <option value="HYGIENE_ITEMS"> Hygieneartikel </option>
+            <option value="SEASON_ITEMS"> Saisonartikel </option>
+            <option value="HOUSEHOLD_ITEMS"> Haushaltsgegenstände </option>
+          </select>
+        </div>
+        <div class="popup-footer">
+          <button class="btn" type="submit" id="add-item-submit"> Ware hinzufügen </button>
         </div>
       </div>
-      <div class="popup-footer">
-        <button class="btn" type="submit" id="add-item-submit"> Ware hinzufügen </button>
+    </div>
+  </form>
+</div>
+
+<div class="popup" id="popup-delete-item">
+  <div class="popup-frame rounded-4">
+    <div class="popup-header">
+      <button class="btn-close" (click)="removeClass('popup-delete-item')" id="close-delete-item"></button>
+    </div>
+    <h2>Warenausgang durchführen</h2>
+    <div class="popup-content">
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">#</span>
+        <input type="text" class="form-control" placeholder="Anzahl angeben" aria-label="Anzahl">
       </div>
     </div>
+    <div class="popup-footer">
+      <button class="btn" type="submit">
+        <p>Bestätigen</p>
+      </button>
+    </div>
   </div>
+</div>
 
 
