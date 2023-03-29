@@ -11,6 +11,8 @@ import { Category } from './enum/category.enum';
 import { NgForm } from '@angular/forms';
 import { Item } from './interface/item';
 
+import * as $ from "jquery";
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -200,58 +202,63 @@ export class AppComponent implements OnInit {
           return of({ dataState: DataState.ERROR, error: error }) //Error State
         })
       ); 
+    
+    $(document).ready(() => {
+      let categoriesChart = new Chart("item-categories", {
+        type: "pie",
+        data: {
+          labels: [
+            "Lebensmittel",
+            "Elektronikartikel",
+            "Hygieneartikel",
+            "Saisonartikel",
+            "Haushaltsartikel"
+          ],
+          datasets: [{
+            label: "Anteile der Warenkategorien",
+            data: [300, 20, 150, 50, 100],
+            backgroundColor: [
+              'rgb(252, 41, 71)',
+              'rgb(113, 73, 198)',
+              'rgb(247, 219, 106)',
+              'rgb(122, 168, 116)',
+              'rgb(216, 100, 169)'
+            ]
+          }]
+        }
+      });
+  
+  
+      new Chart("categories-value", {
+        type: "pie",
+        data: {
+          labels: [
+            "Lebensmittel",
+            "Elektronikartikel",
+            "Hygieneartikel",
+            "Saisonartikel",
+            "Haushaltsartikel"
+          ],
+          datasets: [{
+            label: "Anteile der Warenkategorien",
+            data: [100, 220, 150, 100, 100],
+            backgroundColor: [
+              'rgb(252, 41, 71)',
+              'rgb(113, 73, 198)',
+              'rgb(247, 219, 106)',
+              'rgb(122, 168, 116)',
+              'rgb(216, 100, 169)'
+            ]
+          }]
+        }
+      });
+  
+
+    })
 
 
  
-    let categoriesChart = new Chart("item-categories", {
-      type: "pie",
-      data: {
-        labels: [
-          "Lebensmittel",
-          "Elektronikartikel",
-          "Hygieneartikel",
-          "Saisonartikel",
-          "Haushaltsartikel"
-        ],
-        datasets: [{
-          label: "Anteile der Warenkategorien",
-          data: [300, 20, 150, 50, 100],
-          backgroundColor: [
-            'rgb(252, 41, 71)',
-            'rgb(113, 73, 198)',
-            'rgb(247, 219, 106)',
-            'rgb(122, 168, 116)',
-            'rgb(216, 100, 169)'
-          ]
-        }]
-      }
-    });
-
-
-    new Chart("categories-value", {
-      type: "pie",
-      data: {
-        labels: [
-          "Lebensmittel",
-          "Elektronikartikel",
-          "Hygieneartikel",
-          "Saisonartikel",
-          "Haushaltsartikel"
-        ],
-        datasets: [{
-          label: "Anteile der Warenkategorien",
-          data: [100, 220, 150, 100, 100],
-          backgroundColor: [
-            'rgb(252, 41, 71)',
-            'rgb(113, 73, 198)',
-            'rgb(247, 219, 106)',
-            'rgb(122, 168, 116)',
-            'rgb(216, 100, 169)'
-          ]
-        }]
-      }
-    });
-
+    
 
   }
 }

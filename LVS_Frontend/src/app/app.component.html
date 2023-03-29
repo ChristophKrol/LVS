@@ -146,7 +146,7 @@
 
 
 <div class="popup " id="popup-new-item">
-  <form >     <!-- #itemForm="ngForm" (ngSubmit)="saveItem(itemForm)" -->
+  <form #itemForm="ngForm" (ngSubmit)="saveItem(itemForm)">     <!--  -->
     <div class="popup-frame rounded-4">
       <div class="popup-header">
         <button (click)="removeClass('popup-new-item')" class="btn-close" id="close-new-item"></button>
@@ -163,10 +163,10 @@
         <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="Größe" aria-label="Größe" required>
           <span class="input-group-text" id="basic-addon1">#</span>
-          <input type="text" class="form-control" placeholder="Anzahl" aria-label="Anzahl" required>
+          <input type="text" class="form-control" placeholder="Anzahl" aria-label="Anzahl">
         </div>
         <div class="btn-div">
-          <select (change)="filterItems($event)" name="category" class="btn btn-info"> //nochmal gucken
+          <select  name="category" class="btn btn-info"> <!--nochmal gucken (change)="filterItems($event)"-->
             <option value="GROCERIES"> Lebensmittel </option>
             <option value="ELECTRONIC_DEVICES"> Elektronik </option>
             <option value="HYGIENE_ITEMS"> Hygieneartikel </option>
