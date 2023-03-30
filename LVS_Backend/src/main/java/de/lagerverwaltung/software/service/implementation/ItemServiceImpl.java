@@ -10,10 +10,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 
 
 /*
-* ServerServiceImpl implementiert Funktionen, die später Datenbakabfragen durchführen
+* ServerServiceImpl implementiert Funktionen, die später Datenbankabfragen durchführen
 * */
 
 @RequiredArgsConstructor
@@ -45,6 +46,12 @@ public class ItemServiceImpl implements ItemService {
     public Collection<Item> list(int limit) {
         log.info("Fetching all items");
         return itemRepo.findAll(PageRequest.of(0, limit)).toList();
+    }
+
+    @Override
+    public Collection<Item> listByCategory(int category) {
+        log.info("Fetching all items by Category");
+        return itemRepo.filterItemsByCategory(category).stream().toList();
     }
 
     /**

@@ -1,4 +1,6 @@
+import { CatPriceSum } from './catpricesum';
 import { Item } from "./item";
+import { CatGrouped } from "./catgrouped";
 
 export interface CustomResponse {
     timestamp: Date;
@@ -7,6 +9,6 @@ export interface CustomResponse {
     reason: string;
     message: string;
     developerMessage: string;
-    data:{items?: Item[], item?: Item}; //Für später: storages: Storage[], storage: Storage
+    data:{items?: Item[], item?: Item, catGroup?: CatGrouped[], catPriceSum?: CatPriceSum[]}; //Für später: storages: Storage[], storage: Storage
 
 }

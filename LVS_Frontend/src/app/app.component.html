@@ -14,7 +14,7 @@
           <span class="item-data-span text-center">
             <h3> Gelagerte Ware </h3>
             <ng-container *ngSwitchCase="DataState.LOADED">
-              <h2> 1000 </h2>
+              <h2> {{itemsStored}} </h2>
             </ng-container>
           </span>
         </div>
@@ -22,7 +22,7 @@
           <span class="item-data-span text-center">
             <h3> Eingänge </h3>
             <ng-container *ngSwitchCase="DataState.LOADED">
-              <h2> 1000 </h2>
+              <h2> {{itemInput}} </h2>
             </ng-container>
           </span>
         </div>
@@ -30,7 +30,7 @@
           <span class="item-data-span text-center">
             <h3> Ausgänge </h3>
             <ng-container *ngSwitchCase="DataState.LOADED">
-              <h2> 1000 </h2>
+              <h2> {{itemOutput}} </h2>
             </ng-container>
           </span>
         </div>
@@ -38,21 +38,21 @@
           <span class="item-data-span text-center">
             <h3> Warenwert </h3>
             <ng-container *ngSwitchCase="DataState.LOADED">
-              <h2> 1000 </h2>
+              <h2> {{itemValue}} </h2>
             </ng-container>
           </span>
         </div>
-
-
       </div>
 
       <div class="col-md-6 col-sm-12 chart-container">
         <div class="pie-chart">
+          <h2> Anteil Warenkategorien </h2>
           <canvas id="item-categories"></canvas>
         </div>
       </div>
       <div class="col-md-6 col-sm-12 chart-container">
         <div class="pie-chart">
+          <h2> Wertanteil pro Kategorie </h2>
           <canvas id="categories-value"></canvas>
         </div>
       </div>
@@ -66,8 +66,7 @@
       <div class="content-header">
         <h2> Warendaten </h2>
         <span>
-          <select (change)="filterItems($event)" name="category" class="btn btn-info" id="categorySelect"> //nochmal
-            gucken
+          <select (change)="filterItems($event)" name="category" class="btn" id="categorySelect"> <!--nochmal gucken-->
             <option value="ALL"> Alle </option>
             <option value="GROCERIES"> Lebensmittel </option>
             <option value="ELECTRONIC_DEVICES"> Elektronik </option>
@@ -97,7 +96,7 @@
               <th> {{item.price}} </th>
               <th> {{getCategoryString(item.category)}} </th>
               <th>
-                <button class="btn" (click)="deleteItem(item)"> <!-- addClass('popup-delete-item') -->
+                <button class="btn" (click)="openDeletePopup('popup-delete-item', item)"> <!-- addClass('popup-delete-item') -->
                   <svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 96 960 960" width="25"
                     style="fill:white">
                     <path
@@ -119,9 +118,10 @@
           </span>
         </button>
       </div>
-
     </div>
   </section>
+
+  <!-- Error Popup -->
   <ng-container *ngSwitchCase="DataState.ERROR">
     <div>
       <div class="popup show">
@@ -133,7 +133,7 @@
             {{appState.error}}
           </div>
           <div class="popup-footer">
-            <button class="btn" type="button">
+            <button (click)="reload()" class="btn" type="button">
               <p>Nochmal Versuchen</p>
             </button>
           </div>
@@ -145,28 +145,30 @@
 </ng-container>
 
 
+<!-- Create Item Popup -->
 <div class="popup " id="popup-new-item">
   <form #itemForm="ngForm" (ngSubmit)="saveItem(itemForm)">     <!--  -->
     <div class="popup-frame rounded-4">
       <div class="popup-header">
-        <button (click)="removeClass('popup-new-item')" class="btn-close" id="close-new-item"></button>
+        <button (click)="removeClass('popup-new-item')" class="btn-close" id="close-new-item" type="button"></button>
       </div>
       <h2>Neue Ware erfassen</h2>
       <div class="popup-content">
   
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Name" aria-label="Name" required>
+          <input ngModel name="name" type="text" class="form-control" placeholder="Name" aria-label="Name" required>
           <span class="input-group-text" id="basic-addon1">€</span>
-          <input type="text" class="form-control" placeholder="Preis/Stück" aria-label="Preis"
+          <input ngModel name="price" type="text" class="form-control" placeholder="Preis/Stück" aria-label="Preis"
             aria-describedby="basic-addon1" required>
         </div>
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Größe" aria-label="Größe" required>
+          <input ngModel name="space" type="text" class="form-control" placeholder="Größe" aria-label="Größe" required>
           <span class="input-group-text" id="basic-addon1">#</span>
           <input type="text" class="form-control" placeholder="Anzahl" aria-label="Anzahl">
         </div>
         <div class="btn-div">
-          <select  name="category" class="btn btn-info"> <!--nochmal gucken (change)="filterItems($event)"-->
+          <select ngModel name="category" class="btn"> <!--nochmal gucken (change)="filterItems($event)"-->
+            <option value="" disabled selected>Kategorie auswählen</option>
             <option value="GROCERIES"> Lebensmittel </option>
             <option value="ELECTRONIC_DEVICES"> Elektronik </option>
             <option value="HYGIENE_ITEMS"> Hygieneartikel </option>
@@ -182,6 +184,8 @@
   </form>
 </div>
 
+
+<!-- Delete Item Popup -->
 <div class="popup" id="popup-delete-item">
   <div class="popup-frame rounded-4">
     <div class="popup-header">
@@ -195,7 +199,7 @@
       </div>
     </div>
     <div class="popup-footer">
-      <button class="btn" type="submit">
+      <button class="btn" type="submit" (click)="deleteItem()">
         <p>Bestätigen</p>
       </button>
     </div>

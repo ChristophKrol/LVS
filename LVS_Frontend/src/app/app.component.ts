@@ -1,3 +1,4 @@
+import { CatPriceSum } from './interface/catpricesum';
 import { catchError, map } from 'rxjs/operators';
 import { DataState } from './enum/data-state.enum';
 import { AppState } from './interface/app-state';
@@ -30,25 +31,28 @@ export class AppComponent implements OnInit {
   readonly DataState = DataState;
 
   private dataSubject = new BehaviorSubject<CustomResponse>(null); //Google rxjs
+  private categoryGroupedDataSubject = new BehaviorSubject<CustomResponse>(null); //Google rxjs
+  private priceSumDataSubject = new BehaviorSubject<CustomResponse>(null); //Google rxjs
 
   private receivedResponse;
-
- 
 
   isActive = false;
 
   chosenCategory = null;
 
+  itemInput = 0;
+  itemOutput = 0;
+
+  currentItem = null; // zum löschen eines Items
+
+  itemsStored = 0;
+
+  itemValue = 0;
+
   /**
    * -----------------------------------------------------------
    */
   constructor(private serverService: ServerService) { }
-
-
-
-
-
-
 
   /**
    * Hilfsfunktion: Konvertiere Categeory zum String
@@ -74,7 +78,7 @@ export class AppComponent implements OnInit {
   }
 
   /**
-   * Konvertiere String zur Category
+   * Hilfsfunktion: Konvertiere String zur Category
    * @param categoryString String zum konvertieren
    * @returns Category
    */
@@ -95,6 +99,10 @@ export class AppComponent implements OnInit {
     }
   }
 
+  /**
+   * Weitere Hilfsfunktionen
+   */
+
   getChosenCategory(category: string): Category {
     return this.convertToCategory(category);
   }
@@ -105,13 +113,40 @@ export class AppComponent implements OnInit {
 
   }
 
+  reload(): void {
+    location.reload();
+  }
+
+  addClass(id: string) {
+    let element = document.getElementById(id);
+    element.classList.add('show');
+  }
+  openDeletePopup(id: string, item: Item) {
+    this.currentItem = item;
+    let element = document.getElementById(id);
+    element.classList.add('show');
+  }
+
+  removeClass(id: string) {
+    let element = document.getElementById(id);
+    element.classList.remove('show');
+  }
+
+/**
+ * Request-Funktionen
+ * Interaktionen mit Backend 
+ */
 
 
   filterItems(event: Event): void {
-
      // Nimm event, extrahiere Wert und konvertiere in Category 
+
+    this.serverService.items$.subscribe(data =>{
+      this.dataSubject = new BehaviorSubject<CustomResponse>(null);
+      this.dataSubject.next(data); // daten neu laden 
+    })
+
     let category: Category = this.convertToCategory((event.target as HTMLSelectElement).value);
-    console.log(category);
     this.appState$ = this.serverService.filter$(category, this.dataSubject.value) // Nimm gespeicherte Daten v. request ==> Die sollen nicht gefiltert werden
       .pipe(
         map(response => {
@@ -127,10 +162,6 @@ export class AppComponent implements OnInit {
   }
 
 
-  
-
-
-
   saveItem(itemForm: NgForm): void {
     this.appState$ = this.serverService.save$(itemForm.value as Item) 
       .pipe(
@@ -139,6 +170,8 @@ export class AppComponent implements OnInit {
             { ...response, data: { items: [response.data.item, ... this.dataSubject.value.data.items] } }
           );
           document.getElementById('close-new-item').click();
+          itemForm.reset();
+          this.itemInput ++;
           return { dataState: DataState.LOADED, appData: this.dataSubject.value } 
         }),
         startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
@@ -148,7 +181,8 @@ export class AppComponent implements OnInit {
       );
   }
 
-  deleteItem(item: Item): void {
+  deleteItem(): void {
+    let item = this.currentItem;
     this.appState$ = this.serverService.delete$(item.id) 
       .pipe(
         map(response => {
@@ -156,6 +190,7 @@ export class AppComponent implements OnInit {
             { ...response, data:
               { items: this.dataSubject.value.data.items.filter(i => i.id !== item.id) }});
           document.getElementById('close-delete-item').click();
+          this.itemOutput ++;
           return { dataState: DataState.LOADED, appData: this.dataSubject.value } 
         }),
         startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
@@ -165,15 +200,6 @@ export class AppComponent implements OnInit {
       );
   }
 
-  addClass(id: string) {
-    let element = document.getElementById(id);
-    element.classList.add('show');
-  }
-
-  removeClass(id: string) {
-    let element = document.getElementById(id);
-    element.classList.remove('show');
-  }
 
 
 
@@ -184,17 +210,15 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {  
     /**
      * Get Request für alle Items aus der Datenbank
-     */
+    */
+
     this.appState$ = this.serverService.items$ //Es werden AppStates zurückgegeben
       .pipe(            // Pipe -> Verkettung mehrerer Operationen
 
         map(response => { // map -> Führt eine Callback-Function aus, nachdem der response gekommen ist
           this.dataSubject.next(response); // Response speichern
-          console.log("dataSubject:");
-          console.log(this.dataSubject.value);
-          this.receivedResponse = this.dataSubject.value;
-          
-          
+          this.itemsStored = this.dataSubject.value.data.items.length;
+          this.receivedResponse = this.dataSubject.value;  
           return { dataState: DataState.LOADED, appData: response } //Response bekommen -> daten geladen (Asynchron)
         }),
         startWith({ dataState: DataState.LOADING }), // Wenn noch nicht geladen -> Gib Loading State
@@ -203,55 +227,88 @@ export class AppComponent implements OnInit {
         })
       ); 
     
+      this.serverService.catGrouped$.subscribe(data =>{
+        this.categoryGroupedDataSubject.next(data); // daten neu laden 
+
+        let categoriesChart = new Chart("item-categories", {
+          type: "pie",
+          data: {
+            labels: [
+              "Elektronikartikel",
+              "Lebensmittel",
+              "Saisonartikel",
+              "Hygieneartikel",
+              "Haushaltsartikel"
+            ],
+            datasets: [{
+              label: "Anteile der Warenkategorien",
+              data: [
+                this.categoryGroupedDataSubject.value.data.catGroup[0].count, 
+                this.categoryGroupedDataSubject.value.data.catGroup[1].count, 
+                this.categoryGroupedDataSubject.value.data.catGroup[2].count, 
+                this.categoryGroupedDataSubject.value.data.catGroup[3].count, 
+                this.categoryGroupedDataSubject.value.data.catGroup[4].count, 
+              ],
+              backgroundColor: [
+                'rgb(252, 41, 71)',
+                'rgb(113, 73, 198)',
+                'rgb(247, 219, 106)',
+                'rgb(122, 168, 116)',
+                'rgb(216, 100, 169)'
+              ]
+            }]
+          }
+        });
+
+
+      });
+     
+      this.serverService.catPriceSum$.subscribe(data =>{
+        this.priceSumDataSubject.next(data); // daten neu laden 
+        this.itemValue = 
+        this.priceSumDataSubject.value.data.catPriceSum[0].price +
+        this.priceSumDataSubject.value.data.catPriceSum[1].price +
+        this.priceSumDataSubject.value.data.catPriceSum[2].price +
+        this.priceSumDataSubject.value.data.catPriceSum[3].price +
+        this.priceSumDataSubject.value.data.catPriceSum[4].price; 
+      
+
+        let priceChart = new Chart("categories-value", {
+          type: "pie",
+          data: {
+            labels: [
+              "Elektronikartikel",
+              "Lebensmittel",
+              "Saisonartikel",
+              "Hygieneartikel",
+              "Haushaltsartikel"
+            ],
+            datasets: [{
+              label: "Anteile der Warenkategorien",
+              data: [
+                this.priceSumDataSubject.value.data.catPriceSum[0].price, 
+                this.priceSumDataSubject.value.data.catPriceSum[1].price, 
+                this.priceSumDataSubject.value.data.catPriceSum[2].price, 
+                this.priceSumDataSubject.value.data.catPriceSum[3].price, 
+                this.priceSumDataSubject.value.data.catPriceSum[4].price, 
+              ],
+              backgroundColor: [
+                'rgb(252, 41, 71)',
+                'rgb(113, 73, 198)',
+                'rgb(247, 219, 106)',
+                'rgb(122, 168, 116)',
+                'rgb(216, 100, 169)'
+              ]
+            }]
+          }
+        });
+      });
+
     $(document).ready(() => {
-      let categoriesChart = new Chart("item-categories", {
-        type: "pie",
-        data: {
-          labels: [
-            "Lebensmittel",
-            "Elektronikartikel",
-            "Hygieneartikel",
-            "Saisonartikel",
-            "Haushaltsartikel"
-          ],
-          datasets: [{
-            label: "Anteile der Warenkategorien",
-            data: [300, 20, 150, 50, 100],
-            backgroundColor: [
-              'rgb(252, 41, 71)',
-              'rgb(113, 73, 198)',
-              'rgb(247, 219, 106)',
-              'rgb(122, 168, 116)',
-              'rgb(216, 100, 169)'
-            ]
-          }]
-        }
-      });
+      
   
   
-      new Chart("categories-value", {
-        type: "pie",
-        data: {
-          labels: [
-            "Lebensmittel",
-            "Elektronikartikel",
-            "Hygieneartikel",
-            "Saisonartikel",
-            "Haushaltsartikel"
-          ],
-          datasets: [{
-            label: "Anteile der Warenkategorien",
-            data: [100, 220, 150, 100, 100],
-            backgroundColor: [
-              'rgb(252, 41, 71)',
-              'rgb(113, 73, 198)',
-              'rgb(247, 219, 106)',
-              'rgb(122, 168, 116)',
-              'rgb(216, 100, 169)'
-            ]
-          }]
-        }
-      });
+      
   
 
     })

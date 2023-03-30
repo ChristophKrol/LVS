@@ -14,7 +14,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 
 /**
- * HTTP-Response Object
+ * HTTP-Response Object -Definition
  */
 @Data
 @SuperBuilder

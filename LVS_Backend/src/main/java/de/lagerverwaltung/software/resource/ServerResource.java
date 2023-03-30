@@ -3,31 +3,29 @@ package de.lagerverwaltung.software.resource;
 
 import de.lagerverwaltung.software.model.Item;
 import de.lagerverwaltung.software.model.Response;
+import de.lagerverwaltung.software.repository.ItemRepo;
 import de.lagerverwaltung.software.service.implementation.ItemServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
 
 /**
- * Responses fuer das Front End
+ * Erstellung der Response Objekte und deren URLs
+ * Definition möglicher Abfragen
  */
 @RestController
 @RequestMapping(value = "/server")
 @RequiredArgsConstructor
 public class ServerResource {
     private final ItemServiceImpl itemService;
+
+    private final ItemRepo itemRepository;
 
     /**
      * ITEM
@@ -47,6 +45,41 @@ public class ServerResource {
     }
 
 
+    @GetMapping("/item/{category}")
+    public ResponseEntity<Response> getItemsByCategory(@PathVariable("category")int category){
+        return ResponseEntity.ok(
+                Response.builder().timestamp(LocalDateTime.now())
+                        .data(Map.of("items", itemService.listByCategory(category)))
+                        .message("Items of chosen category retrieved")
+                        .status(OK)
+                        .statusCode(OK.value())
+                        .build()
+        );
+    }
+
+    @GetMapping("/item/test")
+    public ResponseEntity<Response> testestetstesttetst(){
+        return ResponseEntity.ok(
+                Response.builder().timestamp(LocalDateTime.now())
+                        .data(Map.of("catGroup", this.itemRepository.groupByCategory()))
+                        .message("Items of chosen category retrieved")
+                        .status(OK)
+                        .statusCode(OK.value())
+                        .build()
+        );
+    }
+
+    @GetMapping("/item/test2")
+    public ResponseEntity<Response> testestetstesttetsts(){
+        return ResponseEntity.ok(
+                Response.builder().timestamp(LocalDateTime.now())
+                        .data(Map.of("catPriceSum", this.itemRepository.groupedByPriceSumsByCategory()))
+                        .message("Items of chosen category retrieved")
+                        .status(OK)
+                        .statusCode(OK.value())
+                        .build()
+        );
+    }
 
     /**
      * Baue das Response-Objekt für Get-Request: ein Item

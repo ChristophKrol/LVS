@@ -52,6 +52,7 @@ section {
 }
 
 .pie-chart {
+    text-align: center;
 
     padding-top: 3rem;
     width: 40%;
@@ -83,6 +84,10 @@ section {
 .btn:hover {
     background-color: #6c6e87;
     color: white;
+}
+
+.btn:active{
+    background-color: #2F4F4F;
 }
 
 thead {

@@ -45,6 +45,18 @@ export class ServerService {
     );
 
 
+  catGrouped$ = <Observable<CustomResponse>>this.http.get<CustomResponse>(`${this.apiUrl}/server/item/test`)
+  .pipe(
+    //tap(console.log),
+    catchError(this.handleError)
+  );
+
+  catPriceSum$ = <Observable<CustomResponse>>this.http.get<CustomResponse>(`${this.apiUrl}/server/item/test2`)
+  .pipe(
+    //tap(console.log),
+    catchError(this.handleError)
+  );
+
   //Filter by Category
   filter$ = (category: Category, response: CustomResponse) => new Observable<CustomResponse>(
     subscriber => {
@@ -54,6 +66,7 @@ export class ServerService {
       let filteredItems: Item[] = [];
       if (category === Category.ALL) {
         message = `Items filtered by ${category} category`;
+        filteredItems = response.data.items; // Nimm SAchen raus, die gewünschte Category haben
       } else {
         const categoryString = getCategoryString(category);
         filteredItems = response.data.items.filter(item => item.category === category); // Nimm SAchen raus, die gewünschte Category haben
