@@ -171,8 +171,9 @@ export class AppComponent implements OnInit {
           );
           document.getElementById('close-new-item').click();
           itemForm.reset();
+          location.reload();
           this.itemInput ++;
-          return { dataState: DataState.LOADED, appData: this.dataSubject.value } 
+          return { dataState: DataState.LOADED, appData: this.dataSubject.value }
         }),
         startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),
         catchError((error: string) => {
@@ -190,6 +191,7 @@ export class AppComponent implements OnInit {
             { ...response, data:
               { items: this.dataSubject.value.data.items.filter(i => i.id !== item.id) }});
           document.getElementById('close-delete-item').click();
+          location.reload();
           this.itemOutput ++;
           return { dataState: DataState.LOADED, appData: this.dataSubject.value } 
         }),
